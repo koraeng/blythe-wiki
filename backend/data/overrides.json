@@ -1,19 +1,40 @@
 {
-  "_comment": "수동 보정 데이터. 키는 blythopia 영문명(name) 그대로, 값은 덮어쓸 필드들. 명시한 필드만 override되고 나머지는 scrape 결과 그대로 유지. 다시 scrape해도 이 파일은 영향 받지 않음.",
+  "_comment": "수동 보정. 키=영문명. 'name'은 영문 교체, '*_kr' 필드는 한국어 모드에서 표시. 명시한 필드만 override, 나머지는 scrape 결과 유지. scrape해도 이 파일은 그대로.",
   "_example": {
     "Doll Name Goes Here": {
+      "name": "Corrected English Name",
+      "name_kr": "인형 한국어 이름",
       "face_color": "Fair",
+      "face_color_kr": "페어",
       "hair_color": "Blonde",
+      "hair_color_kr": "금발",
       "hairstyle": "Long wavy with bangs",
+      "hairstyle_kr": "긴 웨이브 + 앞머리",
       "eye_color": "Blue (right), Pink (front)",
+      "eye_color_kr": "오른쪽 파랑, 정면 분홍",
       "release_date": "January 1, 2020",
-      "price": "20,000 yen"
+      "release_date_kr": "2020년 1월 1일",
+      "price": "20,000 yen",
+      "price_kr": "20,000엔",
+      "description_kr": "(긴 설명도 한국어로 작성 가능)"
     }
   },
   "LADY CAMELLIA": {
     "hair_color": "Purplish brown"
   },
-    "Garden of Joy CWC Exclusive 16th Anniversary": {
+  "Garden of Joy CWC Exclusive 16th Anniversary": {
     "hair_color": "Purplish brown×Blond Mix color"
+  },
+  "Ambrosial": {
+    "hair_color": "Blonde"
+  },
+    "Curly Blue Babe": {
+    "hair_color": "Dark Blue"
+  },
+      "Manuheali’i Paradise Girl (MPG)": {
+    "face_color": "tanned skintone"
+  },
+    "Prima Dolly Heather Sky (PDHS)": {
+    "face_color": "tanned skintone"
   }
 }

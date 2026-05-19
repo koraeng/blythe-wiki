@@ -1,3 +1,9 @@
+import {
+  pickLocalized,
+  translateHairBucket,
+  translateSkinBucket,
+  useLocale,
+} from "@/hooks/use-locale";
 import { Picker } from "@react-native-picker/picker";
 import { Image } from "expo-image"; // ← 이거 추가
 import { useRouter } from "expo-router";
@@ -33,6 +39,14 @@ type Doll = {
   release_date?: string;
   price?: string;
   description?: string;
+  name_kr?: string;
+  face_color_kr?: string;
+  hair_color_kr?: string;
+  hairstyle_kr?: string;
+  eye_color_kr?: string;
+  release_date_kr?: string;
+  price_kr?: string;
+  description_kr?: string;
 };
 
 const MONTHS = [
@@ -55,15 +69,18 @@ const SKIN_BUCKETS: { label: string; keywords: string[] }[] = [
   { label: "Fair", keywords: ["fair", "natural"] },
   { label: "Cream", keywords: ["cream"] },
   { label: "Snow", keywords: ["snow"] },
-  { label: "Mocha", keywords: ["mocha", "latte", "tan"] },
-  { label: "Chocolate", keywords: ["chocolate", "choco", "brown skin"] },
+  {
+    label: "Tan",
+    keywords: ["mocha", "latte", "tan", "chocolate", "choco", "brown skin"],
+  },
 ];
 
 const HAIR_BUCKETS: { label: string; keywords: string[] }[] = [
   { label: "Blonde", keywords: ["blonde", "blond"] },
+  { label: "Yellow", keywords: ["yellow", "honey", "lemon", "gold"] },
   { label: "Brown", keywords: ["brown", "auburn"] },
   { label: "Black", keywords: ["black"] },
-  { label: "Red", keywords: ["red", "orange"] },
+  { label: "Red", keywords: ["red", "orange", "burgundy"] },
   { label: "Pink", keywords: ["pink"] },
   { label: "Purple", keywords: ["purple", "purplish", "violet", "lavender", "mauve"] },
   { label: "Blue", keywords: ["blue"] },
@@ -137,6 +154,7 @@ function HighlightedText({
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { locale, setLocale, t } = useLocale();
   const [dolls, setDolls] = useState<Doll[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -179,10 +197,7 @@ export default function HomeScreen() {
     dolls.forEach((d) =>
       classifyAll(d.face_color, SKIN_BUCKETS).forEach((b) => present.add(b)),
     );
-    return [
-      ...SKIN_BUCKETS.filter((b) => present.has(b.label)).map((b) => b.label),
-      ...(present.has("Other") ? ["Other"] : []),
-    ];
+    return [...present].sort((a, b) => a.localeCompare(b));
   }, [dolls]);
 
   const availableHairBuckets = useMemo(() => {
@@ -190,10 +205,7 @@ export default function HomeScreen() {
     dolls.forEach((d) =>
       classifyAll(d.hair_color, HAIR_BUCKETS).forEach((b) => present.add(b)),
     );
-    return [
-      ...HAIR_BUCKETS.filter((b) => present.has(b.label)).map((b) => b.label),
-      ...(present.has("Other") ? ["Other"] : []),
-    ];
+    return [...present].sort((a, b) => a.localeCompare(b));
   }, [dolls]);
 
   const normalizedSearch = search.trim().toLowerCase();
@@ -203,9 +215,17 @@ export default function HomeScreen() {
       const matchSearch =
         normalizedSearch === ""
           ? true
-          : [d.name, d.face_type, String(d.release_year), MONTHS[d.release_month]]
+          : [
+              d.name,
+              d.name_kr,
+              d.face_type,
+              String(d.release_year),
+              MONTHS[d.release_month],
+            ]
               .filter(Boolean)
-              .some((field) => field.toLowerCase().includes(normalizedSearch));
+              .some((field) =>
+                (field as string).toLowerCase().includes(normalizedSearch),
+              );
       const matchYear =
         selectedYear === "all" ? true : d.release_year === Number(selectedYear);
       const matchFace =
@@ -237,18 +257,29 @@ export default function HomeScreen() {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#ff8fab" />
-        <Text style={styles.loadingText}>인형 불러오는 중...</Text>
+        <Text style={styles.loadingText}>{t.loadingDolls}</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
+      {/* 언어 토글 */}
+      <Pressable
+        style={styles.localeToggle}
+        onPress={() => setLocale(locale === "en" ? "kr" : "en")}
+        hitSlop={8}
+      >
+        <Text style={styles.localeToggleText}>
+          {locale === "en" ? "🇰🇷 KR" : "🇺🇸 EN"}
+        </Text>
+      </Pressable>
+
       {/* 검색창 */}
       <View style={styles.searchWrap}>
         <TextInput
           style={styles.searchInput}
-          placeholder="🔍 이름 · Face Type · 출시년월 검색..."
+          placeholder={t.searchPlaceholder}
           value={search}
           onChangeText={setSearch}
           placeholderTextColor="#bbb"
@@ -267,14 +298,14 @@ export default function HomeScreen() {
       {/* 필터 */}
       <View style={styles.filterRow}>
         <View style={styles.pickerWrap}>
-          <Text style={styles.filterLabel}>📅 출시년도</Text>
+          <Text style={styles.filterLabel}>{t.filterYear}</Text>
           <View style={styles.pickerBox}>
             <Picker
               selectedValue={selectedYear}
               onValueChange={(val) => setSelectedYear(val)}
               style={styles.picker}
             >
-              <Picker.Item label="전체" value="all" />
+              <Picker.Item label={t.all} value="all" />
               {years.map((y) => (
                 <Picker.Item key={y} label={String(y)} value={String(y)} />
               ))}
@@ -283,14 +314,14 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.pickerWrap}>
-          <Text style={styles.filterLabel}>🎭 Face Type</Text>
+          <Text style={styles.filterLabel}>{t.filterFaceType}</Text>
           <View style={styles.pickerBox}>
             <Picker
               selectedValue={selectedFaceType}
               onValueChange={(val) => setSelectedFaceType(val)}
               style={styles.picker}
             >
-              <Picker.Item label="전체" value="all" />
+              <Picker.Item label={t.all} value="all" />
               {faceTypes.map((ft) => (
                 <Picker.Item key={ft} label={ft} value={ft} />
               ))}
@@ -301,10 +332,10 @@ export default function HomeScreen() {
 
       <View style={styles.chipSection}>
         <View style={styles.chipHeader}>
-          <Text style={styles.filterLabel}>🧴 Skin (다중 선택)</Text>
+          <Text style={styles.filterLabel}>{t.filterSkin}</Text>
           {selectedSkins.length > 0 && (
             <Pressable onPress={() => setSelectedSkins([])} hitSlop={6}>
-              <Text style={styles.chipReset}>초기화</Text>
+              <Text style={styles.chipReset}>{t.reset}</Text>
             </Pressable>
           )}
         </View>
@@ -320,7 +351,7 @@ export default function HomeScreen() {
                 <Text
                   style={[styles.chipText, active && styles.chipTextActive]}
                 >
-                  {b}
+                  {translateSkinBucket(b, locale)}
                 </Text>
               </Pressable>
             );
@@ -330,10 +361,10 @@ export default function HomeScreen() {
 
       <View style={styles.chipSection}>
         <View style={styles.chipHeader}>
-          <Text style={styles.filterLabel}>💇 Hair (다중 선택)</Text>
+          <Text style={styles.filterLabel}>{t.filterHair}</Text>
           {selectedHairs.length > 0 && (
             <Pressable onPress={() => setSelectedHairs([])} hitSlop={6}>
-              <Text style={styles.chipReset}>초기화</Text>
+              <Text style={styles.chipReset}>{t.reset}</Text>
             </Pressable>
           )}
         </View>
@@ -349,7 +380,7 @@ export default function HomeScreen() {
                 <Text
                   style={[styles.chipText, active && styles.chipTextActive]}
                 >
-                  {b}
+                  {translateHairBucket(b, locale)}
                 </Text>
               </Pressable>
             );
@@ -358,7 +389,7 @@ export default function HomeScreen() {
       </View>
 
       {/* 결과 수 */}
-      <Text style={styles.resultCount}>{filtered.length}개</Text>
+      <Text style={styles.resultCount}>{t.resultCount(filtered.length)}</Text>
 
       {/* 인형 리스트 */}
       <FlatList
@@ -369,63 +400,74 @@ export default function HomeScreen() {
         maxToRenderPerBatch={10}
         windowSize={5}
         removeClippedSubviews={true}
-        renderItem={({ item }) => (
-          <Pressable
-            style={({ pressed }) => [
-              styles.card,
-              pressed && styles.cardPressed,
-            ]}
-            onPress={() =>
-              router.push({
-                pathname: "/doll/[name]",
-                params: {
-                  name: item.name,
-                  image: item.image,
-                  release_year: String(item.release_year),
-                  release_month: String(item.release_month),
-                  face_type: item.face_type,
-                  face_color: item.face_color ?? "",
-                  hair_color: item.hair_color ?? "",
-                  hairstyle: item.hairstyle ?? "",
-                  eye_color: item.eye_color ?? "",
-                  release_date: item.release_date ?? "",
-                  price: item.price ?? "",
-                  description: item.description ?? "",
-                },
-              })
-            }
-          >
-            {item.image ? (
-              <Image
-                source={{ uri: item.image }}
-                style={styles.image}
-                contentFit="cover"
-                transition={200}
-              />
-            ) : (
-              <View style={[styles.image, styles.noImage]}>
-                <Text>No Image</Text>
-              </View>
-            )}
-            <View style={styles.info}>
-              <HighlightedText
-                text={item.name}
-                query={normalizedSearch}
-                style={styles.name}
-              />
-              <Text style={styles.date}>
-                {MONTHS[item.release_month]} {item.release_year}
-              </Text>
-              {item.face_type ? (
-                <HighlightedText
-                  text={item.face_type}
-                  query={normalizedSearch}
-                  style={styles.faceType}
+        renderItem={({ item }) => {
+          const displayName = pickLocalized(item, "name", locale) as string;
+          return (
+            <Pressable
+              style={({ pressed }) => [
+                styles.card,
+                pressed && styles.cardPressed,
+              ]}
+              onPress={() =>
+                router.push({
+                  pathname: "/doll/[name]",
+                  params: {
+                    name: item.name,
+                    image: item.image,
+                    release_year: String(item.release_year),
+                    release_month: String(item.release_month),
+                    face_type: item.face_type,
+                    face_color: item.face_color ?? "",
+                    hair_color: item.hair_color ?? "",
+                    hairstyle: item.hairstyle ?? "",
+                    eye_color: item.eye_color ?? "",
+                    release_date: item.release_date ?? "",
+                    price: item.price ?? "",
+                    description: item.description ?? "",
+                    name_kr: item.name_kr ?? "",
+                    face_color_kr: item.face_color_kr ?? "",
+                    hair_color_kr: item.hair_color_kr ?? "",
+                    hairstyle_kr: item.hairstyle_kr ?? "",
+                    eye_color_kr: item.eye_color_kr ?? "",
+                    release_date_kr: item.release_date_kr ?? "",
+                    price_kr: item.price_kr ?? "",
+                    description_kr: item.description_kr ?? "",
+                  },
+                })
+              }
+            >
+              {item.image ? (
+                <Image
+                  source={{ uri: item.image }}
+                  style={styles.image}
+                  contentFit="cover"
+                  transition={200}
                 />
-              ) : null}
-            </View>
-          </Pressable>
-        )}
+              ) : (
+                <View style={[styles.image, styles.noImage]}>
+                  <Text>{t.noImage}</Text>
+                </View>
+              )}
+              <View style={styles.info}>
+                <HighlightedText
+                  text={displayName}
+                  query={normalizedSearch}
+                  style={styles.name}
+                />
+                <Text style={styles.date}>
+                  {MONTHS[item.release_month]} {item.release_year}
+                </Text>
+                {item.face_type ? (
+                  <HighlightedText
+                    text={item.face_type}
+                    query={normalizedSearch}
+                    style={styles.faceType}
+                  />
+                ) : null}
+              </View>
+            </Pressable>
+          );
+        }}
       />
     </View>
   );
@@ -437,6 +479,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff9fb",
     paddingTop: 56,
     paddingHorizontal: 16,
+  },
+  localeToggle: {
+    position: "absolute",
+    top: 12,
+    right: 16,
+    zIndex: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#f0d0da",
+  },
+  localeToggleText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#d63384",
   },
   center: {
     flex: 1,
@@ -462,6 +521,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     borderWidth: 1,
     borderColor: "#f0d0da",
+    outlineStyle: "none",
+    outlineWidth: 0,
   },
   clearButton: {
     position: "absolute",
@@ -503,11 +564,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#f0d0da",
-    overflow: "hidden",
+        paddingLeft:10,
+    paddingRight:10
   },
   picker: {
-    height: 44,
+    height: 40,
     color: "#333",
+    borderRadius: 0,
+    borderColor: "#ffffff00",
+    // @ts-expect-error web-only outline props for removing focus ring
+    outlineStyle: "none",
+    outlineWidth: 0,
   },
   resultCount: {
     fontSize: 12,

@@ -1,3 +1,4 @@
+import { pickLocalized, useLocale } from "@/hooks/use-locale";
 import { Image } from "expo-image";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -37,6 +38,14 @@ type DollParams = {
   release_date: string;
   price: string;
   description: string;
+  name_kr: string;
+  face_color_kr: string;
+  hair_color_kr: string;
+  hairstyle_kr: string;
+  eye_color_kr: string;
+  release_date_kr: string;
+  price_kr: string;
+  description_kr: string;
 };
 
 function InfoRow({ label, value }: { label: string; value: string }) {
@@ -52,17 +61,27 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 export default function DollDetailScreen() {
   const params = useLocalSearchParams<DollParams>();
   const router = useRouter();
+  const { t, locale } = useLocale();
+
+  const displayName = pickLocalized(params, "name", locale) as string;
+  const displayFaceColor = pickLocalized(params, "face_color", locale) as string;
+  const displayHairColor = pickLocalized(params, "hair_color", locale) as string;
+  const displayHairstyle = pickLocalized(params, "hairstyle", locale) as string;
+  const displayEyeColor = pickLocalized(params, "eye_color", locale) as string;
+  const displayPrice = pickLocalized(params, "price", locale) as string;
+  const displayDescription = pickLocalized(params, "description", locale) as string;
+  const displayReleaseDate = pickLocalized(params, "release_date", locale) as string;
 
   const month = Number(params.release_month) || 0;
   const year = Number(params.release_year) || 0;
   const dateLabel =
-    params.release_date || (month && year ? `${MONTHS[month]} ${year}` : "");
+    displayReleaseDate || (month && year ? `${MONTHS[month]} ${year}` : "");
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: params.name || "Detail",
+          title: displayName || t.detail,
           headerTitleStyle: { fontSize: 14 },
           headerStyle: { backgroundColor: "#fff9fb" },
           headerTintColor: "#d63384",
@@ -81,11 +100,11 @@ export default function DollDetailScreen() {
           />
         ) : (
           <View style={[styles.image, styles.noImage]}>
-            <Text>No Image</Text>
+            <Text>{t.noImage}</Text>
           </View>
         )}
 
-        <Text style={styles.name}>{params.name}</Text>
+        <Text style={styles.name}>{displayName}</Text>
 
         <View style={styles.badgeRow}>
           {dateLabel ? (
@@ -101,18 +120,18 @@ export default function DollDetailScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Specs</Text>
-          <InfoRow label="Face Color" value={params.face_color} />
-          <InfoRow label="Hair Color" value={params.hair_color} />
-          <InfoRow label="Hairstyle" value={params.hairstyle} />
-          <InfoRow label="Eye Color" value={params.eye_color} />
-          <InfoRow label="Price" value={params.price} />
+          <Text style={styles.sectionTitle}>{t.specs}</Text>
+          <InfoRow label={t.faceColor} value={displayFaceColor} />
+          <InfoRow label={t.hairColor} value={displayHairColor} />
+          <InfoRow label={t.hairstyle} value={displayHairstyle} />
+          <InfoRow label={t.eyeColor} value={displayEyeColor} />
+          <InfoRow label={t.price} value={displayPrice} />
         </View>
 
-        {params.description ? (
+        {displayDescription ? (
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Description</Text>
-            <Text style={styles.description}>{params.description}</Text>
+            <Text style={styles.sectionTitle}>{t.description}</Text>
+            <Text style={styles.description}>{displayDescription}</Text>
           </View>
         ) : null}
 
@@ -120,7 +139,7 @@ export default function DollDetailScreen() {
           onPress={() => router.back()}
           style={styles.backButton}
         >
-          <Text style={styles.backButtonText}>← 목록으로</Text>
+          <Text style={styles.backButtonText}>{t.backToList}</Text>
         </Pressable>
       </ScrollView>
     </>

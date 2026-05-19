@@ -45,22 +45,25 @@ FACE_TYPE_TEXT_MAP = [
 
 DETAIL_DELIM_PATTERN = re.compile(
     r'\b(face\s*type|face\s*colou?r|hair\s*colou?r|hair\s*style|hairstyle|'
-    r'eye\s*shadow|eyeshadow|lips?|blush|cheek|eye\s*colou?r|eyelid|'
-    r'eye\s*lashes|eyelashes|manicure|nail\s*polish|piercing|'
+    r'eye\s*shadow|eyeshadow|lips?|blush|cheek|eye\s*colou?r|eye\s*lids?|eyelids?|'
+    r'eye\s*lashes|eyelashes|eyelash|manicure|nail\s*polish|piercing|'
     r'(?:ear[\s-]?rings?|earrings?)|'
-    r'(?:the\s+)?set\s*(?:contents|includes)|'
-    r'make\s*up|makeup|release\s*date|'
+    r'(?:set\s+of\s+)?special\s+(?:eye\s+)?(?:colou?rs?|chips)|'
+    r'eye\s*chips|eyechips|'
+    r'(?:the\s+)?set\s*(?:contents|includes)?|'
+    r'make\s*up|makeup|shipping\s*date|release\s*date|release\s*type|release|'
+    r'skin\s*type|stock|notes|share\s*this|msrp|preorder|stand|hair|'
     r'(?:suggested\s+retail\s+)?price)\s*[:：]',
     re.IGNORECASE
 )
 
 DETAIL_FIELD_ALIASES = {
     'face_color':   ['face color', 'face colour'],
-    'hair_color':   ['hair color', 'hair colour'],
+    'hair_color':   ['hair color', 'hair colour', 'hair'],
     'hairstyle':    ['hairstyle', 'hair style'],
     'eye_color':    ['eye color', 'eye colour'],
-    'release_date': ['release date'],
-    'price':        ['suggested retail price', 'price'],
+    'release_date': ['release date', 'release'],
+    'price':        ['suggested retail price', 'price', 'msrp'],
 }
 
 TRAILING_HEADER_RE = re.compile(

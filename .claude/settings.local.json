@@ -8,7 +8,9 @@
       "Bash(curl -s http://localhost:8000/dolls)",
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); m=[x for x in d if x['name']=='LADY CAMELLIA'][0]; print\\('hair_color:', repr\\(m.get\\('hair_color'\\)\\)\\)\")",
       "Bash(PYTHONIOENCODING=utf-8 python scrape.py)",
-      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); m=[x for x in d if x['name']=='LADY CAMELLIA'][0]; print\\('LADY CAMELLIA hair_color:', repr\\(m['hair_color']\\)\\)\")"
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); m=[x for x in d if x['name']=='LADY CAMELLIA'][0]; print\\('LADY CAMELLIA hair_color:', repr\\(m['hair_color']\\)\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(python *)"
     ]
   }
 }
