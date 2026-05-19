@@ -1,0 +1,19 @@
+{
+  "_comment": "수동 보정 데이터. 키는 blythopia 영문명(name) 그대로, 값은 덮어쓸 필드들. 명시한 필드만 override되고 나머지는 scrape 결과 그대로 유지. 다시 scrape해도 이 파일은 영향 받지 않음.",
+  "_example": {
+    "Doll Name Goes Here": {
+      "face_color": "Fair",
+      "hair_color": "Blonde",
+      "hairstyle": "Long wavy with bangs",
+      "eye_color": "Blue (right), Pink (front)",
+      "release_date": "January 1, 2020",
+      "price": "20,000 yen"
+    }
+  },
+  "LADY CAMELLIA": {
+    "hair_color": "Purplish brown"
+  },
+    "Garden of Joy CWC Exclusive 16th Anniversary": {
+    "hair_color": "Purplish brown×Blond Mix color"
+  }
+}
